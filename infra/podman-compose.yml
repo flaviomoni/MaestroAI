@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # 1. Orquestrador Central Multi-Agente v2 (10 Agentes + Portal Entrada Única com Captcha + WebCenter REST Gateway)
+  agent-orchestrator:
+    build:
+      context: ../app
+      dockerfile: ../infra/Containerfile
+    container_name: agent-orchestrator
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - OBSIDIAN_VAULT_PATH=/obsidian
+      - LAYOUT_PROJECT_PATH=/layout/portal-universal-template
+      - SIMULATION_MODE=true
+    volumes:
+      # Monta o cofre do Obsidian para RAG Local-First e gravação de aprendizados (Economia de Tokens)
+      - ../:/obsidian:rw
+      # Monta o repositório oficial de Layout do WebCenter Portal (AAR + JSPX)
+      - ../layout:/layout:ro
+    networks:
+      - dmz_net
+      - internal_net
+    restart: unless-stopped
+
+  # 2. Camada DMZ: Apache HTTPD 2.4 (Reverse Proxy + ModSecurity Headers)
+  apache-dmz:
+    image: docker.io/library/httpd:2.4-alpine
+    container_name: portal-apache-dmz
+    profiles: ["full-infra"]
+    ports:
+      - "8088:80"
+      - "8443:443"
+    networks:
+      - dmz_net
+      - internal_net
+    restart: unless-stopped
+
+  # 3. Identidade & Autorização Multi-Cliente: OpenLDAP 2.6
+  openldap:
+    image: docker.io/osixia/openldap:1.5.0
+    container_name: portal-openldap
+    profiles: ["full-infra"]
+    environment:
+      LDAP_ORGANISATION: "Enterprise Portal Lab"
+      LDAP_DOMAIN: "empresa.com.br"
+      LDAP_ADMIN_PASSWORD: "admin_password"
+    ports:
+      - "1389:389"
+    networks:
+      - internal_net
+    restart: unless-stopped
+
+  # 4. Camada de Dados: Oracle Database 23ai Free (Bancos WCPDB + APPSDB)
+  oracle-db:
+    image: docker.io/gvenzl/oracle-free:23-slim
+    container_name: portal-oracle-db
+    profiles: ["full-infra"]
+    environment:
+      ORACLE_PASSWORD: "oracle_password"
+      APP_USER: "wcp_user"
+      APP_USER_PASSWORD: "wcp_password"
+    ports:
+      - "1521:1521"
+    networks:
+      - internal_net
+    restart: unless-stopped
+
+  # 5. Core Portal: Oracle WebLogic 12.2.1.4 / WebCenter Portal
+  # Imagem homologada Oracle Container Registry ou build local via Dockerfile oficial Oracle
+  webcenter-portal:
+    image: container-registry.oracle.com/middleware/webcenter-portal:12.2.1.4
+    container_name: portal-webcenter-wls
+    profiles: ["full-infra-wcp"]
+    environment:
+      - DOMAIN_NAME=wcp_domain
+      - ADMIN_NAME=AdminServer
+      - ADMIN_PORT=17001
+      - MANAGED_SERVER_PORT=19500
+      - DB_HOST=oracle-db
+      - DB_PORT=1521
+      - DB_SERVICE=FREEPDB1
+      - DB_SCHEMA_PREFIX=DEV
+      - DB_PASSWORD=oracle_password
+      - JAVA_OPTIONS=-Xms2048m -Xmx4096m -XX:+UseG1GC
+    ports:
+      - "17001:17001" # WebLogic AdminServer Console & REST Management API
+      - "19500:19500" # WebCenter Portal Managed Server (WC_Portal_server1)
+    depends_on:
+      - oracle-db
+      - openldap
+    networks:
+      - internal_net
+    restart: unless-stopped
+
+networks:
+  dmz_net:
+    driver: bridge
+  internal_net:
+    driver: bridge

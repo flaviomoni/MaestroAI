@@ -1,0 +1,79 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: agent-orchestrator
+  main:
+    banner-mode: console
+
+logging:
+  file:
+    name: logs/orchestrator.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.log
+      max-file-size: 10MB
+      max-history: 30 # Retenção de 1 mês (30 dias)
+      total-size-cap: 1GB # Limite de capacidade (100 arquivos de 10MB)
+      clean-history-on-start: false
+
+corp:
+  ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-2.0-flash}
+      temperature: 0.2
+      max-output-tokens: 2048
+    rag:
+      knowledge-path: ${KNOWLEDGE_PATH:../knowledge}
+      layout-project-path: ${LAYOUT_PROJECT_PATH:../layout/portal-universal-template}
+    simulation-mode: ${SIMULATION_MODE:false}
+    infra:
+      apache:
+        host: ${SSH_APACHE_HOST:10.10.1.10}
+        port: ${SSH_APACHE_PORT:22}
+        user: ${SSH_APACHE_USER:appuser}
+        password: ${SSH_APACHE_PASS:}
+        private-key-path: ${SSH_APACHE_KEY:}
+        timeout-ms: 3000
+      weblogic:
+        admin-host: ${WLS_ADMIN_HOST:10.10.2.20}
+        admin-port: ${WLS_ADMIN_PORT:17001}
+        wcp1-host: ${WCP1_HOST:10.10.2.20}
+        wcp1-port: ${WCP1_PORT:19500}
+        wcp2-host: ${WCP2_HOST:10.10.2.21}
+        wcp2-port: ${WCP2_PORT:19500}
+        username: ${WLS_USER:weblogic}
+        password: ${WLS_PASS:}
+        timeout-ms: 3000
+      ldap:
+        host: ${LDAP_HOST:10.10.2.30}
+        port: ${LDAP_PORT:389}
+        use-ssl: false
+        base-dn: ${LDAP_BASE_DN:dc=empresa,dc=com,dc=br}
+        bind-dn: ${LDAP_BIND_DN:cn=admin,dc=empresa,dc=com,dc=br}
+        bind-password: ${LDAP_BIND_PASS:}
+        timeout-ms: 3000
+      oracle-wcp:
+        url: ${ORACLE_WCP_URL:jdbc:oracle:thin:@10.10.3.40:1521/WCPDB}
+        user: ${ORACLE_WCP_USER:wcp_user}
+        password: ${ORACLE_WCP_PASS:}
+        timeout-seconds: 3
+      oracle-apps:
+        url: ${ORACLE_APPS_URL:jdbc:oracle:thin:@10.10.3.41:1521/APPDB}
+        user: ${ORACLE_APPS_USER:app_user}
+        password: ${ORACLE_APPS_PASS:}
+        timeout-seconds: 3
+      spring-actuator-url: ${SPRING_ACTUATOR_URL:http://10.10.2.20:8080/actuator/health}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

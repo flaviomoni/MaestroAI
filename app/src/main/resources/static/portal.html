@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle WebCenter Portal — Ambiente Corporativo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/portal-theme.css">
+</head>
+<body class="portal-main-body">
+
+    <!-- Topbar Corporativa do WebCenter Portal (Adaptável dinamicamente por cliente) -->
+    <header class="portal-main-topbar" id="portalHeader">
+        <div class="portal-topbar-left">
+            <div class="portal-logo-container">
+                <span class="portal-logo-symbol">🌐</span>
+                <div>
+                    <h1 class="portal-site-name" id="portalTitleText">Portal Corporativo Enterprise</h1>
+                    <span class="portal-site-domain">Oracle WebCenter Portal 14c / 12c • Primesys</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="portal-topbar-right">
+            <div class="portal-user-badge">
+                <span class="user-avatar-circle">👤</span>
+                <div class="user-info-text">
+                    <span class="user-name-label" id="userNameLabel">joao.silva</span>
+                    <span class="user-role-label" id="userRoleLabel">CLIENT_ENTERPRISE</span>
+                </div>
+            </div>
+            <a href="/monitor.html" class="btn-topbar-action" title="Acessar painel SRE de monitoração e correções">
+                ⚙️ Monitoração SRE
+            </a>
+            <button id="btnLogout" class="btn-topbar-logout" title="Encerrar sessão no Portal">
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Barra de Navegação Horizontal Dinâmica (Baseada nos módulos do perfil LDAP) -->
+    <nav class="portal-nav-bar" id="portalNavBar">
+        <div class="portal-nav-inner" id="portalNavItems">
+            <button class="portal-nav-link active" data-tab="overview">📊 Visão Geral</button>
+            <button class="portal-nav-link" data-tab="circuits">🔌 Topologia & Circuitos</button>
+            <button class="portal-nav-link" data-tab="invoices">📄 Faturas & Contratos</button>
+            <button class="portal-nav-link" data-tab="tickets">🎫 Trouble Tickets</button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal do WebCenter Portal -->
+    <main class="portal-workspace-container">
+
+        <!-- Banner de Contexto da Sessão Corporativa -->
+        <div class="portal-session-banner" id="sessionBanner">
+            <div class="banner-left">
+                <span class="banner-icon">ℹ️</span>
+                <div>
+                    <strong id="sessionGreeting">Bem-vindo ao Portal Corporativo Enterprise</strong>
+                    <p id="sessionDetails">Entrada única resolvida via OpenLDAP • Page Template Universal (portal_universal_pagetemplate.aar) ativo com a cor primária <code id="currentColorCode">#004e8b</code>.</p>
+                </div>
+            </div>
+            <div class="banner-right">
+                <span class="portal-status-pill green">
+                    <span class="status-dot green"></span>
+                    Sessão Segura (Captcha Validado)
+                </span>
+            </div>
+        </div>
+
+        <!-- Seção 1: KPIs e Indicadores de Contrato / SLA -->
+        <section class="portal-kpi-grid">
+            <div class="portal-card kpi-card">
+                <div class="kpi-label">Disponibilidade Mensal (SLA)</div>
+                <div class="kpi-value text-success" id="kpiSlaValue">99.98%</div>
+                <div class="kpi-sub">Meta contratual: 99.50%</div>
+            </div>
+            <div class="portal-card kpi-card">
+                <div class="kpi-label">Latência Média de Acesso</div>
+                <div class="kpi-value" id="kpiLatencyValue">14 ms</div>
+                <div class="kpi-sub">Apache DMZ → WebCenter Cluster</div>
+            </div>
+            <div class="portal-card kpi-card">
+                <div class="kpi-label">Circuitos / Serviços Ativos</div>
+                <div class="kpi-value" id="kpiCircuitsValue">12 / 12</div>
+                <div class="kpi-sub">100% operacionais</div>
+            </div>
+            <div class="portal-card kpi-card">
+                <div class="kpi-label">Chamados Técnicos Abertos</div>
+                <div class="kpi-value" id="kpiTicketsValue">0</div>
+                <div class="kpi-sub">Nenhum incidente no momento</div>
+            </div>
+        </section>
+
+        <!-- Seção 2: Grid de Conteúdo Principal -->
+        <div class="portal-content-grid">
+            <!-- Coluna Principal: Tabela de Serviços e Circuitos Dedicados -->
+            <section class="portal-card portal-table-card">
+                <div class="portal-card-header">
+                    <div class="portal-card-title">
+                        <span class="card-icon">📁</span>
+                        <span>Inventário de Serviços Dedicados & Conectividade</span>
+                    </div>
+                    <div class="portal-card-actions">
+                        <button class="btn-portal-secondary btn-sm" id="btnRefreshServices">
+                            🔄 Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+                <div class="portal-table-wrapper">
+                    <table class="portal-table" id="servicesTable">
+                        <thead>
+                            <tr>
+                                <th>Designação do Serviço</th>
+                                <th>Tipo de Enlace</th>
+                                <th>Origem / Destino</th>
+                                <th>Largura de Banda</th>
+                                <th>Status Operacional</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesTableBody">
+                            <tr>
+                                <td><strong>VPN-CORP-SP-01</strong></td>
+                                <td>MPLS Dedicado Primário</td>
+                                <td>DC São Paulo ↔ Barueri</td>
+                                <td>1 Gbps</td>
+                                <td><span class="badge-status-ok">OPERACIONAL</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VPN-CORP-RJ-02</strong></td>
+                                <td>MPLS Dedicado Redundante</td>
+                                <td>DC Rio de Janeiro ↔ Barueri</td>
+                                <td>500 Mbps</td>
+                                <td><span class="badge-status-ok">OPERACIONAL</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>LINK-INT-BGP-01</strong></td>
+                                <td>Trânsito IP / Internet Dedicada</td>
+                                <td>PoP São Paulo</td>
+                                <td>2 Gbps</td>
+                                <td><span class="badge-status-ok">OPERACIONAL</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ENDPOINT-WCP-REST</strong></td>
+                                <td>API Gateway WebCenter</td>
+                                <td>/rest/api/v1/portals</td>
+                                <td>HTTPS 443</td>
+                                <td><span class="badge-status-ok">ATIVO</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Coluna Lateral: Metadados Técnicos do Oracle WebCenter Portal -->
+            <aside class="portal-card portal-meta-card">
+                <div class="portal-card-header">
+                    <div class="portal-card-title">
+                        <span class="card-icon">🏛️</span>
+                        <span>Arquitetura WebCenter Portal</span>
+                    </div>
+                </div>
+                <div class="portal-meta-body">
+                    <ul class="portal-meta-list" id="metaDetailsList">
+                        <li>
+                            <span class="meta-name">Ambiente Alvo:</span>
+                            <span class="meta-val" id="metaTargetVersion">WebCenter Portal 14c / 12c R2</span>
+                        </li>
+                        <li>
+                            <span class="meta-name">Page Template:</span>
+                            <span class="meta-val">portal_universal_pagetemplate.aar</span>
+                        </li>
+                        <li>
+                            <span class="meta-name">Skin Family:</span>
+                            <span class="meta-val">assetSkinUniversal</span>
+                        </li>
+                        <li>
+                            <span class="meta-name">Origem da Identidade:</span>
+                            <span class="meta-val">OpenLDAP (ou=ClientProfiles)</span>
+                        </li>
+                        <li>
+                            <span class="meta-name">Banco de Metadados:</span>
+                            <span class="meta-val">Oracle DB (WCPDB / MDS)</span>
+                        </li>
+                        <li>
+                            <span class="meta-name">Endpoint REST Oficial:</span>
+                            <span class="meta-val" id="metaRestEndpoint">/rest/api/v1/portals/portal-enterprise</span>
+                        </li>
+                    </ul>
+
+                    <div class="portal-callout-info">
+                        <strong>💡 Entrada Única em Ação:</strong>
+                        <p>O mesmo arquivo <code>Portal-Universal.jspx</code> é compartilhado por todos os clientes. As cores, logotipos e menus se adaptam dinamicamente a cada sessão.</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Rodapé Corporativo -->
+    <footer class="portal-footer">
+        <div class="portal-footer-inner">
+            <span>Oracle WebCenter Portal • Claro Empresas / Primesys Soluções Corporativas</span>
+            <div class="portal-footer-links">
+                <a href="/login.html">Trocar de Usuário / Login</a> • 
+                <a href="/monitor.html">Console de Monitoração SRE (Maestro AI)</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/portal-main.js"></script>
+</body>
+</html>

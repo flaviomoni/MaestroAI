@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maestro AI — Console SRE de Monitoração & Correções</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/monitor-theme.css">
+</head>
+<body class="monitor-body">
+
+    <!-- Topbar Enxuta de Operações SRE -->
+    <header class="monitor-header">
+        <div class="header-brand">
+            <div class="header-logo">🎛️</div>
+            <div>
+                <h1>Maestro AI — Console de Monitoração SRE</h1>
+                <p>Orquestrador Central Multi-Agente • Resoluções Pontuais & Ações da Infraestrutura</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <div class="status-pill" id="vpnStatusPill">
+                <span class="status-dot green pulse"></span>
+                <span>VPN: Ativa</span>
+            </div>
+            <div class="status-pill" id="sseStatusPill">
+                <span class="status-dot green"></span>
+                <span id="sseStatusText">Stream: Conectado</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btnRefreshStatus" title="Atualizar estado dos nós">
+                🔄 Atualizar Nós
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnRunDiagnostics" title="Executar diagnóstico em tempo real">
+                ⚡ Diagnóstico Real
+            </button>
+            <a href="/login.html" class="btn btn-portal-nav btn-sm" title="Ir para a tela de Login do Portal">
+                🌐 Ir para Login do Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- Seção Superior Compacta: Nós Monitorados da Topologia -->
+    <section class="nodes-overview-strip">
+        <div class="strip-header">
+            <span class="strip-title">Topologia dos Nós Monitorados (8 nós)</span>
+            <span class="strip-summary" id="nodesSummaryLabel">Carregando telemetria...</span>
+        </div>
+        <div class="nodes-compact-grid" id="infraNodesGrid">
+            <!-- Cards compactos renderizados via JS -->
+            <div class="node-compact-card skeleton">Carregando nós...</div>
+        </div>
+    </section>
+
+    <!-- Workspace Principal: Divisão Limpa em 2 Colunas -->
+    <main class="monitor-workspace-grid">
+        
+        <!-- Coluna 1: Chat com o Maestro para Resoluções Pontuais -->
+        <section class="panel-card chat-section">
+            <div class="panel-header">
+                <div class="panel-title-wrap">
+                    <span class="panel-icon">👑</span>
+                    <div>
+                        <h3>Chat com o Maestro — Resolução Pontual</h3>
+                        <span class="panel-subtitle">Decomposição ReAct com os 10 Agentes Especialistas</span>
+                    </div>
+                </div>
+                <button class="btn-icon" id="btnClearChat" title="Limpar conversa">🗑️</button>
+            </div>
+
+            <!-- Chips de Resoluções Pontuais Rápidas -->
+            <div class="prompt-chips-bar">
+                <button class="prompt-chip" id="chip504">🚨 Investigar Erro 504 no Portal</button>
+                <button class="prompt-chip" id="chipStuck">🧵 Checar Stuck Threads no WebLogic</button>
+                <button class="prompt-chip" id="chipLdap">🔑 Testar Binds no OpenLDAP</button>
+                <button class="prompt-chip" id="chipOracle">🗄️ Inspecionar Locks no Oracle</button>
+                <button class="prompt-chip" id="chipCyber">🛡️ Ativar Escudo CyberSec</button>
+            </div>
+
+            <!-- Janela de Mensagens do Chat -->
+            <div class="chat-messages-container" id="chatMessagesContainer">
+                <div class="chat-bubble agent-bubble">
+                    <div class="bubble-header">
+                        <span class="sender-avatar">👑</span>
+                        <strong>Agente Maestro Central</strong>
+                        <span class="bubble-time">Agora</span>
+                    </div>
+                    <div class="bubble-content">
+                        Olá! Sou o <strong>Maestro AI</strong>. Estou pronto para resolver incidentes pontuais nos nós do Portal WebCenter, servidores WebLogic, Apache DMZ, OpenLDAP, aplicações Spring e Bancos Oracle.
+                        <br><br>
+                        Você pode clicar nos atalhos acima ou descrever a falha em linguagem natural para que eu acione os especialistas correspondentes.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Envio -->
+            <form class="chat-input-form" id="chatInputForm">
+                <div class="input-row">
+                    <textarea 
+                        id="userPromptInput" 
+                        placeholder="Descreva o incidente para resolução pontual (ex: Usuários reportando erro 504 no Portal)..." 
+                        rows="2" 
+                        required></textarea>
+                    <button type="submit" class="btn btn-primary btn-send" id="btnSendMessage">
+                        <span>Resolver</span>
+                        <span>⚡</span>
+                    </button>
+                </div>
+                <div class="input-hint">
+                    💡 <em>Toda remediação crítica requer aprovação humana prévia via HITL.</em>
+                </div>
+            </form>
+        </section>
+
+        <!-- Coluna 2: Histórico de Correções e Ações dos Agentes -->
+        <section class="panel-card history-section">
+            <div class="panel-header">
+                <div class="panel-title-wrap">
+                    <span class="panel-icon">📜</span>
+                    <div>
+                        <h3>Histórico de Correções & Ações dos Agentes</h3>
+                        <span class="panel-subtitle">Auditoria de defesas, remediações e aprendizados (Custo = 0 tokens)</span>
+                    </div>
+                </div>
+                <button class="btn-icon" id="btnRefreshHistory" title="Atualizar histórico">🔄</button>
+            </div>
+
+            <!-- Lista / Timeline de Histórico -->
+            <div class="history-list-container" id="historyListContainer">
+                <div class="history-empty">Carregando histórico de ações...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal de Decisão HITL (Human-in-the-Loop) -->
+    <div class="hitl-modal-backdrop hidden" id="hitlModalBackdrop">
+        <div class="hitl-modal glass-panel-modal">
+            <div class="modal-header">
+                <div class="modal-title-wrap">
+                    <span class="modal-warning-icon">⚠️</span>
+                    <div>
+                        <h3>Aprovação Humana Requerida (HITL)</h3>
+                        <p class="modal-subtitle">O Agente Maestro solicita autorização para executar uma ação corretiva.</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" id="btnHitlClose">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="hitl-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">Ação:</span>
+                        <strong class="meta-val" id="hitlActionName">wls_restart_managed_node</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Alvo:</span>
+                        <strong class="meta-val" id="hitlTarget">APP_server1</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Nível de Risco:</span>
+                        <span class="risk-badge" id="hitlRiskBadge">MÉDIO</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Agente Solicitante:</span>
+                        <span class="agent-tag" id="hitlAgentTag">Agente WebLogic</span>
+                    </div>
+                </div>
+
+                <div class="hitl-field-group">
+                    <label>Justificativa Técnica do Maestro:</label>
+                    <div class="justification-box" id="hitlJustificationBox">
+                        Carregando justificativa...
+                    </div>
+                </div>
+
+                <div class="hitl-field-group">
+                    <label>Comando Não-Privilegiado Proposto:</label>
+                    <pre class="command-box"><code id="hitlCommandCode">jstack -l PID</code></pre>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="btnHitlReject">
+                    ❌ Rejeitar Ação
+                </button>
+                <button class="btn btn-success" id="btnHitlApprove">
+                    ✅ Aprovar e Executar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/monitor-main.js"></script>
+</body>
+</html>

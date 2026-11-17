@@ -1,0 +1,34 @@
+# Compiled class file & Maven build output
+target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Environment & Secrets (CRITICAL: never commit real .env credentials)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.jks
+*.p12
+
+# Application Logs
+logs/
+*.log
+
+# IDE & OS files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.DS_Store
+Thumbs.db
+

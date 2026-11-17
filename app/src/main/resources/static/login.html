@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle WebCenter Portal — Login Corporativo Unificado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/portal-theme.css">
+</head>
+<body class="portal-login-body">
+
+    <!-- Topbar Corporativa Oficial WebCenter Portal (Claro Empresas / Primesys) -->
+    <header class="portal-topbar">
+        <div class="portal-topbar-inner">
+            <div class="portal-brand">
+                <span class="portal-logo-symbol">🌐</span>
+                <div class="portal-brand-text">
+                    <span class="portal-brand-title">Oracle WebCenter Portal</span>
+                    <span class="portal-brand-sub">Claro Empresas • Primesys</span>
+                </div>
+            </div>
+            <div class="portal-topbar-actions">
+                <a href="/monitor.html" class="portal-topbar-link" title="Acessar console de monitoramento e triagem SRE">
+                    ⚙️ Console de Monitoração SRE
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Container Central de Autenticação -->
+    <main class="portal-login-container">
+        <div class="portal-card portal-login-card">
+            <div class="portal-card-header-accent"></div>
+            
+            <div class="portal-login-header">
+                <div class="portal-login-badge">
+                    <span class="portal-icon-lock">🔐</span>
+                </div>
+                <h2>Acesso Unificado ao Portal</h2>
+                <p>Entrada única para todos os clientes com autenticação OpenLDAP e proteção ativa contra automação.</p>
+            </div>
+
+            <form id="wcpLoginForm" class="portal-form">
+                <!-- Usuário -->
+                <div class="portal-form-group">
+                    <label for="usernameInput">Usuário Corporativo (LDAP uid)</label>
+                    <input type="text" id="usernameInput" class="portal-input" placeholder="ex: joao.silva" value="joao.silva" required autocomplete="username">
+                    <small class="portal-form-hint">O perfil e a visão do portal são atribuídos automaticamente pelos grupos do OpenLDAP.</small>
+                </div>
+
+                <!-- Senha -->
+                <div class="portal-form-group">
+                    <label for="passwordInput">Senha de Rede</label>
+                    <input type="password" id="passwordInput" class="portal-input" placeholder="••••••••" value="senha123" required autocomplete="current-password">
+                </div>
+
+                <!-- Desafio CAPTCHA Integrado (Validado por Cibersegurança) -->
+                <div class="portal-form-group">
+                    <label for="captchaAnswerInput">Verificação de Segurança (CAPTCHA)</label>
+                    <div class="portal-captcha-row">
+                        <div class="portal-captcha-display" id="captchaDisplayBox">
+                            <span class="portal-captcha-code" id="captchaQuestionText">Carregando...</span>
+                        </div>
+                        <input type="number" id="captchaAnswerInput" class="portal-input portal-captcha-input" placeholder="Resultado" required>
+                        <button type="button" id="btnReloadCaptcha" class="btn-portal-secondary btn-icon-only" title="Recarregar novo desafio">
+                            🔄
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensagem de Alerta / Erro / Bloqueio -->
+                <div id="loginFeedbackBox" class="portal-alert-box" style="display: none;"></div>
+
+                <!-- Botão de Login -->
+                <button type="submit" id="btnSubmitLogin" class="btn-portal-primary btn-portal-block">
+                    <span>Acessar Portal WebCenter</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <!-- Testes Rápidos de Homologação / Simulação -->
+            <div class="portal-sec-test-area">
+                <span class="sec-test-title">🧪 SIMULAÇÃO DE PERFIS DO LDAP & TESTES DE SEGURANÇA:</span>
+                <div class="sec-test-buttons">
+                    <button type="button" class="btn-sec-chip" id="btnUserEnterprise" title="Preencher usuário do grupo CLIENT_ENTERPRISE">
+                        👤 Enterprise (joao.silva)
+                    </button>
+                    <button type="button" class="btn-sec-chip" id="btnUserPremium" title="Preencher usuário do grupo CLIENT_PREMIUM">
+                        👤 Premium (maria.gold)
+                    </button>
+                    <button type="button" class="btn-sec-chip" id="btnUserPartner" title="Preencher usuário do grupo CLIENT_PARTNER">
+                        👤 Parceiro (carlos.parceiro)
+                    </button>
+                    <button type="button" class="btn-sec-chip" id="btnSimulateSqli">
+                        🛡️ SQLi (' OR 1=1--)
+                    </button>
+                    <button type="button" class="btn-sec-chip" id="btnSimulateXss">
+                        🛡️ XSS (&lt;script&gt;)
+                    </button>
+                    <button type="button" class="btn-sec-chip" id="btnSimulateWrongCaptcha">
+                        ❌ Captcha Errado
+                    </button>
+                </div>
+            </div>
+
+            <div class="portal-login-footer">
+                <p>Oracle WebCenter Portal 14c / 12c R2 • Primesys Soluções Corporativas</p>
+                <div class="portal-login-meta">
+                    <span>Apache DMZ (Proxy Reverso)</span> • 
+                    <span>OpenLDAP v3</span> • 
+                    <span>Dual DB (WCPDB / APPSDB)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/portal-login.js"></script>
+</body>
+</html>
