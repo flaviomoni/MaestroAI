@@ -11,7 +11,7 @@ It features a **Local-First Zero-Token RAG Engine** (Obsidian Markdown runbooks)
 ```mermaid
 flowchart TD
     subgraph Perimeter["Perimeter & Identity Tier"]
-        APACHE["Apache HTTPD 2.4 (DMZ Reverse Proxy)\n200.159.224.96"]
+        APACHE["Apache HTTPD 2.4 (DMZ Reverse Proxy)\n200.150.202.01"]
         LDAP["OpenLDAP 2.6 (ou=ClientProfiles & ou=Users)\nPort 389 / 1389"]
     end
 
